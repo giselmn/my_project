@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from typing import List
 
 app = FastAPI()
 
@@ -13,6 +14,9 @@ class IncomeRequest(BaseModel):
 
 class ExpenseRequest(BaseModel):
     expense: float
+    category: str
+
+expenses = []
 
 @app.post("/set-income")
 async def set_income(request: IncomeRequest):
@@ -32,9 +36,11 @@ async def add_expense(request: ExpenseRequest):
     global remaining_balance
     if request.expense <= remaining_balance:
         remaining_balance -= request.expense
+        expenses.append({"amount": request.expense, "category": request.category})
         return {
             "message": "Expense added successfully",
             "remainingBalance": remaining_balance,
+            "expenses": expenses,
         }
     raise HTTPException(
         status_code=400,
@@ -47,3 +53,7 @@ async def get_balance():
         "initialIncome": initial_income,
         "remainingBalance": remaining_balance,
     }
+
+@app.get("/expenses")
+async def get_expenses():
+    return {"expenses": expenses}
