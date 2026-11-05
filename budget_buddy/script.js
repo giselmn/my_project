@@ -87,4 +87,59 @@ function updateExpenseReport() {
         reportItem.textContent = `${category}: $${total.toFixed(2)}`;
         reportDiv.appendChild(reportItem);
     }
+
+    const ctx = document.getElementById("expense-chart").getContext("2d");
+    const expenseChart = new Chart(ctx, {
+        type: "pie",
+        data: {
+            labels: [], // Categories (e.g., Food, Rent)
+            datasets: [
+                {
+                    label: "Expenses",
+                    data: [], // Amounts corresponding to categories
+                    backgroundColor: [
+                        "#FF6384", // Colors for each category
+                        "#36A2EB",
+                        "#FFCE56",
+                        "#4BC0C0",
+                        "#9966FF",
+                        "#FF9F40",
+                    ],
+                    hoverOffset: 4,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: "bottom",
+                },
+            },
+        },
+    });
+
+    // Add event listener to the form
+    document.getElementById("budget-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const expenseAmount = parseFloat(document.getElementById("expenses").value);
+    const expenseCategory = document.getElementById("expense-category").value;
+
+    if (expenseAmount && expenseCategory) {
+        const categoryIndex = expenseChart.data.labels.indexOf(expenseCategory);
+
+        if (categoryIndex === -1) {
+            expenseChart.data.labels.push(expenseCategory);
+            expenseChart.data.datasets[0].data.push(expenseAmount);
+        } else {
+            expenseChart.data.datasets[0].data[categoryIndex] += expenseAmount;
+        }
+
+        expenseChart.update();
+    }
+
+    document.getElementById("expenses").value = "";
+    document.getElementById("expense-category").value = "";
+});
 }

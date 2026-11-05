@@ -9,7 +9,7 @@ body {
   }
   
   header {
-    background-color: #4caf50;
+    background-color: #4b10c8;
     color: white;
     padding: 1rem;
   }
@@ -34,13 +34,13 @@ body {
   }
   
   button {
-    background-color: #4caf50;
+    background-color: #4b10c8;
     color: white;
     cursor: pointer;
   }
   
   button:hover {
-    background-color: #45a049;
+    background-color: #4b10c8;
   }
   
   #result {

@@ -1,8 +1,16 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (or specify your Live Server URL, e.g., "http://127.0.0.1:5500")
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # In-memory storage for practice
 initial_income = 0
@@ -29,7 +37,6 @@ async def set_income(request: IncomeRequest):
             "initialIncome": initial_income,
             "remainingBalance": remaining_balance,
         }
-    raise HTTPException(status_code=400, detail="Income already set")
 
 @app.post("/add-expense")
 async def add_expense(request: ExpenseRequest):
@@ -57,3 +64,11 @@ async def get_balance():
 @app.get("/expenses")
 async def get_expenses():
     return {"expenses": expenses}
+
+@app.post("/reset")
+async def reset_income():
+    global initial_income, remaining_balance, expenses
+    initial_income = 0
+    remaining_balance = 0
+    expenses = []
+    return {"message": "Income and expenses have been reset"}

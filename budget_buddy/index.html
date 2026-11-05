@@ -12,7 +12,11 @@
     <p>Track your budget and get reactions from your favorite characters!</p>
   </header>
 
-  <main>
+  <main style="display: flex; gap: 2rem; align-items: flex-start;">
+    <!-- Pie Chart -->
+    <div style="width: 300px; height: 300px;">
+      <canvas id="expense-chart"></canvas>
+    </div>
     <form id="budget-form">
       <label for="income">Income (Enter only once):</label>
       <input type="number" id="income" placeholder="Enter your income" required>
@@ -59,6 +63,8 @@
     <p>Made with ❤️ for budgeting enthusiasts!</p>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- For backend-connected frontend just change to script-backend.js -->
   <script src="script.js"></script>
 </body>
 </html>
