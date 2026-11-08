@@ -65,6 +65,13 @@ async def get_balance():
 async def get_expenses():
     return {"expenses": expenses}
 
+@app.get("/exepnses-summary")
+async def expense_summary():
+    category_totals = {}
+    for expense in expenses:
+        category_totals[expense["category"]] = category_totals.get(expense["category"], 0) + expense["amount"]
+    return {"categoryTotals": category_totals}
+
 @app.post("/reset")
 async def reset_income():
     global initial_income, remaining_balance, expenses

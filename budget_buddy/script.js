@@ -3,6 +3,40 @@ let remainingBalance = 0;
 let monthlyBudget = 0;
 let expenses = []; // Array to store all expenses
 
+
+// Create the pie chart ONCE
+const ctx = document.getElementById("expense-chart").getContext("2d");
+
+const expenseChart = new Chart(ctx, {
+    type: "pie",
+    data: {
+        labels: [],
+        datasets: [{
+            label: "Expenses",
+            data: [],
+            backgroundColor: [
+                "#FF6384",
+                "#36A2EB",
+                "#FFCE56",
+                "#4BC0C0",
+                "#9966FF",
+                "#FF9F40",
+            ],
+            hoverOffset: 4,
+        }],
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: "bottom",
+            },
+        },
+    },
+});
+
+
+
 // Add event listener to the form
 document.getElementById('budget-form').addEventListener('submit', function (e) {
     e.preventDefault(); // Prevent form submission
@@ -65,81 +99,43 @@ document.getElementById('Clear-button').addEventListener('click', function () {
 
     // Clear the expense report
     document.getElementById('expense-report').innerHTML = '';
+
+    // Clear pie chart
+    expenseChart.data.labels = [];
+    expenseChart.data.datasets[0].data = [];
+    expenseChart.update();
 });
 
 // Function to update the expense report
 function updateExpenseReport() {
-    const reportDiv = document.getElementById('expense-report');
-    reportDiv.innerHTML = ''; // Clear the report
+    const reportDiv = document.getElementById("expense-report");
+    reportDiv.innerHTML = "";
 
     // Group expenses by category
     const categoryTotals = {};
+
     expenses.forEach(expense => {
         if (!categoryTotals[expense.category]) {
             categoryTotals[expense.category] = 0;
         }
+
         categoryTotals[expense.category] += expense.amount;
     });
 
-    // Display the report
+    // Display expense totals
     for (const [category, total] of Object.entries(categoryTotals)) {
-        const reportItem = document.createElement('p');
+        const reportItem = document.createElement("p");
+
         reportItem.textContent = `${category}: $${total.toFixed(2)}`;
+
         reportDiv.appendChild(reportItem);
     }
 
-    const ctx = document.getElementById("expense-chart").getContext("2d");
-    const expenseChart = new Chart(ctx, {
-        type: "pie",
-        data: {
-            labels: [], // Categories (e.g., Food, Rent)
-            datasets: [
-                {
-                    label: "Expenses",
-                    data: [], // Amounts corresponding to categories
-                    backgroundColor: [
-                        "#FF6384", // Colors for each category
-                        "#36A2EB",
-                        "#FFCE56",
-                        "#4BC0C0",
-                        "#9966FF",
-                        "#FF9F40",
-                    ],
-                    hoverOffset: 4,
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: "bottom",
-                },
-            },
-        },
-    });
+    // Update existing pie chart
+    expenseChart.data.labels = Object.keys(categoryTotals);
 
-    // Add event listener to the form
-    document.getElementById("budget-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+    expenseChart.data.datasets[0].data =
+        Object.values(categoryTotals);
 
-    const expenseAmount = parseFloat(document.getElementById("expenses").value);
-    const expenseCategory = document.getElementById("expense-category").value;
-
-    if (expenseAmount && expenseCategory) {
-        const categoryIndex = expenseChart.data.labels.indexOf(expenseCategory);
-
-        if (categoryIndex === -1) {
-            expenseChart.data.labels.push(expenseCategory);
-            expenseChart.data.datasets[0].data.push(expenseAmount);
-        } else {
-            expenseChart.data.datasets[0].data[categoryIndex] += expenseAmount;
-        }
-
-        expenseChart.update();
-    }
-
-    document.getElementById("expenses").value = "";
-    document.getElementById("expense-category").value = "";
-});
+    expenseChart.update();
 }

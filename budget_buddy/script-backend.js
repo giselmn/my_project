@@ -96,5 +96,46 @@ async function fetchInitialData() {
     }
 }
 
+// Reset budget button
+document.getElementById("Clear-button").addEventListener("click", async function () {
+    try {
+        const response = await fetch(`${API_URL}/reset`, {
+            method: "POST",
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            console.log(data.message);
+
+            // Optional: Clear the input fields
+            document.getElementById("income").value = "";
+            document.getElementById("expenses").value = "";
+            document.getElementById("expense-category").value = "";
+
+
+            // Reset the displayed income and balance
+            document.getElementById("initial-income").textContent = "0.00";
+            document.getElementById("remaining-balance").textContent = "0.00";
+            // Clear the result message
+            document.getElementById("result").textContent = "";
+            // Reset character image
+            document.getElementById("character-img").src = "assets/remie_think.gif";
+
+
+            // Clear the expense report
+            document.getElementById("expense-report").innerHTML = "";
+
+
+            alert("Your budget has been reset!");
+        } else {
+            alert("Failed to reset budget.");
+        }
+    } catch (error) {
+        console.error("Error resetting budget:", error);
+    }
+});
+
+
 // Fetch initial data when the page loads
 fetchInitialData();
