@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budget Buddy</title>
+  <link rel="stylesheet" href="/budget_buddy/style.css">
+</head>
+<body>
+  <header>
+    <h1>Budget Buddy</h1>
+    <p>Track your budget and get reactions from your favorite characters!</p>
+  </header>
+
+  <main style="display: flex; gap: 2rem; align-items: flex-start;">
+    <!-- Pie Chart -->
+    <div style="width: 300px; height: 300px;">
+      <canvas id="expense-chart"></canvas>
+    </div>
+    <form id="budget-form">
+      <label for="income">Income (Enter only once):</label>
+      <input type="number" id="income" placeholder="Enter your income" required>
+      
+      <label for="expenses">Expenses:</label>
+      <input type="number" id="expenses" placeholder="Enter your expenses" required>
+
+      <label for="expense-category">Expense Category:</label>
+      <input type="text" id="expense-category" placeholder="Enter expense category" required>
+      
+      <button type="submit">Calculate</button>
+      <button type="button" id="Clear-button">Clear</button>
+    </form>
+
+    <!-- Display the remaining balance -->
+    <div id="balance">
+      <p><strong>Initial Income:</strong> $<span id="initial-income">0.00</span></p>
+      <p><strong>Remaining Balance:</strong> $<span id="remaining-balance">0.00</span></p>
+    </div>
+
+    <div id="result"></div>
+
+    <div id="character">
+      <img id="character-img" src="budget_buddy/assets/remie_awe.gif" alt="Character Reaction">
+    </div>
+  </main>
+
+  <!-- Expense Report -->
+   <div id="expense-report">
+    <h2>Expense Report</h2>
+    <table id="expense-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Expense rows will be added here dynamically -->
+      </tbody>
+    </table>
+
+  <footer>
+    <p>Made with ❤️ for budgeting enthusiasts!</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- For backend-connected frontend just change to script-backend.js -->
+  <script src="budget_buddy/script.js"></script>
+</body>
+</html>

@@ -69,10 +69,10 @@ document.getElementById('budget-form').addEventListener('submit', function (e) {
         document.getElementById('remaining-balance').textContent = remainingBalance.toFixed(2);
 
         result.textContent = `You spent $${expenseAmount.toFixed(2)} on ${expenseCategory}. Remaining balance: $${remainingBalance.toFixed(2)}.`;
-        characterImg.src = 'assets/remie_proud.webp'; // Happy character
+        characterImg.src = 'budget_buddy/assets/remie_proud.webp'; // Happy character
     } else {
         result.textContent = `Oh no! You don't have enough funds. You're short by $${(expenseAmount - remainingBalance).toFixed(2)}.`;
-        characterImg.src = 'assets/remie_work.gif'; // Sad character
+        characterImg.src = 'budget_buddy/assets/remie_work.gif'; // Sad character
     }
 
     // Update the expense report
@@ -95,7 +95,7 @@ document.getElementById('Clear-button').addEventListener('click', function () {
     document.getElementById('initial-income').textContent = '0.00';
     document.getElementById('remaining-balance').textContent = '0.00';
     document.getElementById('result').textContent = '';
-    document.getElementById('character-img').src = 'assets/remie_awe.gif'; // Default character image
+    document.getElementById('character-img').src = 'budget_buddy/assets/remie_awe.gif'; // Default character image
 
     // Clear the expense report
     document.getElementById('expense-report').innerHTML = '';
