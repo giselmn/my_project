@@ -1,7 +1,10 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends,FastAPI, HTTPException, status
+from fastapi import Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from typing import List
+from security import create_access_token, verify_access_token
 
 app = FastAPI()
 app.add_middleware(
@@ -11,6 +14,43 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+# Dependency to get the current user
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    payload = verify_access_token(token)
+    if not payload:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return payload
+
+from pydantic import BaseModel
+
+# Mock user database
+fake_users_db = {
+    "testuser": {"username": "testuser", "password": "testpassword"}
+}
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+@app.post("/token")
+def login(username: str = Form(...), password: str = Form(...)):
+    user = fake_users_db.get(username)
+    if not user or user["password"] != password:
+        raise HTTPException(status_code=400, detail="Invalid username or password")
+    
+    # Create JWT token
+    access_token = create_access_token(data={"sub": username})
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.get("/protected-route")
+def protected_route(current_user: dict = Depends(get_current_user)):
+    return {"message": f"Hello, {current_user['sub']}!"}
 
 # In-memory storage for practice
 initial_income = 0
