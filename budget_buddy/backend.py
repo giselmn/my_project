@@ -1,10 +1,14 @@
-from fastapi import Depends,FastAPI, HTTPException, status
-from fastapi import Form
+from fastapi import Depends,FastAPI, HTTPException, status, Form, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from typing import List
 from security import create_access_token, verify_access_token
+from functools import wraps
+from sqlalchemy.orm import Session
+from database import SessionLocal
+from models import User, Expense
+from passlib.context import CryptContext
 
 app = FastAPI()
 app.add_middleware(
@@ -15,6 +19,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+#Depedency to get the database session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 # Dependency to get the current user
 def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -37,6 +50,20 @@ fake_users_db = {
 class LoginRequest(BaseModel):
     username: str
     password: str
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+@app.post("/create-user")
+def create_user(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+    # Directly store the plain-text password (no hashing)
+    print(f"Password length: {len(password)}")
+    
+    # Create the user
+    user = User(username=username, password=password)  # Store plain-text password
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return {"message": "User created successfully", "user": {"id": user.id, "username": user.username}}
 
 @app.post("/token")
 def login(username: str = Form(...), password: str = Form(...)):
@@ -67,7 +94,7 @@ class ExpenseRequest(BaseModel):
 expenses = []
 
 @app.post("/set-income")
-async def set_income(request: IncomeRequest):
+async def set_income(request: IncomeRequest, current_user: dict = Depends(get_current_user)):
     global initial_income, remaining_balance
     if initial_income == 0:
         initial_income = request.income
