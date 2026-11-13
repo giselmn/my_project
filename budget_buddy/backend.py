@@ -66,10 +66,19 @@ def create_user(username: str = Form(...), password: str = Form(...), db: Sessio
     return {"message": "User created successfully", "user": {"id": user.id, "username": user.username}}
 
 @app.post("/token")
-def login(username: str = Form(...), password: str = Form(...)):
-    user = fake_users_db.get(username)
-    if not user or user["password"] != password:
-        raise HTTPException(status_code=400, detail="Invalid username or password")
+def login(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+    # Check the actual database for the user
+    user = db.query(User).filter(User.username == username).first()
+
+    if user:
+        # Compare plain-text passwords directly (no hashing for now)
+        if user.password != password: # type: ignore
+            raise HTTPException(status_code=400, detail="Invalid username or password")
+    else:
+        # Check the fake database if the user is not in the actual database
+        user = fake_users_db.get(username)
+        if not user or user["password"] != password:
+            raise HTTPException(status_code=400, detail="Invalid username or password")
     
     # Create JWT token
     access_token = create_access_token(data={"sub": username})
