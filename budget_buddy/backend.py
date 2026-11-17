@@ -53,33 +53,43 @@ class LoginRequest(BaseModel):
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-@app.post("/create-user")
+@app.post("/create-user", summary="Create a new user")
 def create_user(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
-    # Directly store the plain-text password (no hashing)
-    print(f"Password length: {len(password)}")
+    # Check if the user already exists
+    existing_user = db.query(User).filter(User.username == username).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User with this username already exists"
+        )
+    
+    # Hash the password
+    hashed_password = pwd_context.hash(password)
     
     # Create the user
-    user = User(username=username, password=password)  # Store plain-text password
+    user = User(username=username, password=hashed_password)
     db.add(user)
     db.commit()
     db.refresh(user)
     return {"message": "User created successfully", "user": {"id": user.id, "username": user.username}}
 
-@app.post("/token")
+@app.post("/token", summary="Login and get access token")
 def login(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     # Check the actual database for the user
     user = db.query(User).filter(User.username == username).first()
 
-    if user:
-        # Compare plain-text passwords directly (no hashing for now)
-        if user.password != password: # type: ignore
-            raise HTTPException(status_code=400, detail="Invalid username or password")
+    # Check if the user exists and verify the password (using passlib for hashing)
+    if not user or not pwd_context.verify(password, user.password): #type: ignore
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid username or password"
+        )
     else:
         # Check the fake database if the user is not in the actual database
         user = fake_users_db.get(username)
         if not user or user["password"] != password:
             raise HTTPException(status_code=400, detail="Invalid username or password")
-    
+        
     # Create JWT token
     access_token = create_access_token(data={"sub": username})
     return {"access_token": access_token, "token_type": "bearer"}

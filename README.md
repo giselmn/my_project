@@ -5,9 +5,19 @@ For now am doing it separately to be able to practice both separately and later 
 
 Instructions: 
 To launch FastAPI run in /budget_buddy : 
-        uvicorn backend:app --reloa
+
+        uvicorn backend:app --reload
+
         open port it is live in and add /docs at end to test API's
 
 To launch frontend with FastAPI change line 68 in index.html to
+
           <script src="script-backend.js"></script>
+
           left click sccript-backend.js in VS-Code "Open with Live Server"
+
+
+To create local database:: 
+
+        pip install sqlalchemy sqlite3
+        python main.py
