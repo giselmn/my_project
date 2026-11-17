@@ -84,11 +84,6 @@ def login(username: str = Form(...), password: str = Form(...), db: Session = De
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid username or password"
         )
-    else:
-        # Check the fake database if the user is not in the actual database
-        user = fake_users_db.get(username)
-        if not user or user["password"] != password:
-            raise HTTPException(status_code=400, detail="Invalid username or password")
         
     # Create JWT token
     access_token = create_access_token(data={"sub": username})
