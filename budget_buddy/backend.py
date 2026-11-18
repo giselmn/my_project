@@ -30,7 +30,7 @@ def get_db():
 
 
 # Dependency to get the current user
-def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     payload = verify_access_token(token)
     if not payload:
         raise HTTPException(
@@ -38,7 +38,15 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
             detail="Invalid or expired token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return payload
+    username = payload.get("sub")
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="User not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user
 
 from pydantic import BaseModel
 
@@ -120,7 +128,7 @@ async def set_income(request: IncomeRequest, current_user: dict = Depends(get_cu
         }
 
 @app.post("/add-expense")
-async def add_expense(request: ExpenseRequest):
+async def add_expense(request: ExpenseRequest, current_user: dict = Depends(get_current_user)):
     global remaining_balance
     if request.expense <= remaining_balance:
         remaining_balance -= request.expense
@@ -136,14 +144,14 @@ async def add_expense(request: ExpenseRequest):
     )
 
 @app.get("/balance")
-async def get_balance():
+async def get_balance(current_user: dict = Depends(get_current_user)):
     return {
         "initialIncome": initial_income,
         "remainingBalance": remaining_balance,
     }
 
 @app.get("/expenses")
-async def get_expenses():
+async def get_expenses(current_user: dict = Depends(get_current_user)):
     return {"expenses": expenses}
 
 @app.get("/exepnses-summary")

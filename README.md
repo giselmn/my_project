@@ -7,6 +7,8 @@ Instructions:
 To launch FastAPI run in /budget_buddy : 
 
         uvicorn backend:app --reload
+        or
+        python -m uvicorn backend:app --reload
 
         open port it is live in and add /docs at end to test API's
 
