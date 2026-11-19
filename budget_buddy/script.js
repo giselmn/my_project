@@ -37,6 +37,25 @@ const expenseChart = new Chart(ctx, {
 
 
 
+let selectedCharacter = "miyabi";
+
+// Function to update selected character
+function updateCharacterSet() {
+    selectedCharacter = document.getElementById("character-select").value;
+
+    // Display the selected character's neutral reaction
+    updateCharacterReaction("neutral");
+}
+
+// Listen for dropdown changes
+document.getElementById("character-select").addEventListener("change", updateCharacterSet);
+
+// Function to update character reaction
+function updateCharacterReaction(reaction) {
+    const characterImg = document.getElementById("character-img");
+
+    characterImg.src = `budget_buddy/assets/${selectedCharacter}/${selectedCharacter}_${reaction}.gif`;
+}
 // Add event listener to the form
 document.getElementById('budget-form').addEventListener('submit', function (e) {
     e.preventDefault(); // Prevent form submission
@@ -69,13 +88,12 @@ document.getElementById('budget-form').addEventListener('submit', function (e) {
         document.getElementById('remaining-balance').textContent = remainingBalance.toFixed(2);
 
         result.textContent = `You spent $${expenseAmount.toFixed(2)} on ${expenseCategory}. Remaining balance: $${remainingBalance.toFixed(2)}.`;
-        characterImg.src = 'budget_buddy/assets/remie_proud.webp'; // Happy character
-    } else {
+        updateCharacterReaction("proud");
+        } else {
         result.textContent = `Oh no! You don't have enough funds. You're short by $${(expenseAmount - remainingBalance).toFixed(2)}.`;
-        characterImg.src = 'budget_buddy/assets/remie_work.gif'; // Sad character
+        updateCharacterReaction("stress");    
     }
-
-    // Update the expense report
+        // Update the expense report
     updateExpenseReport();
 });
 
@@ -95,7 +113,7 @@ document.getElementById('Clear-button').addEventListener('click', function () {
     document.getElementById('initial-income').textContent = '0.00';
     document.getElementById('remaining-balance').textContent = '0.00';
     document.getElementById('result').textContent = '';
-    document.getElementById('character-img').src = 'budget_buddy/assets/remie_awe.gif'; // Default character image
+    updateCharacterReaction("neutral");
 
     // Clear the expense report
     document.getElementById('expense-report').innerHTML = '';

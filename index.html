@@ -12,6 +12,13 @@
     <p>Track your budget and get reactions from your favorite characters!</p>
   </header>
 
+  <label for="character-select">Choose a Character:</label>
+
+  <select id="character-select">
+      <option value="miyabi">Miyabi</option>
+      <option value="remielle">Remielle</option>
+  </select>
+
   <main style="display: flex; gap: 2rem; align-items: flex-start;">
     <!-- Pie Chart -->
     <div style="width: 300px; height: 300px;">
@@ -40,7 +47,9 @@
     <div id="result"></div>
 
     <div id="character">
-      <img id="character-img" src="budget_buddy/assets/remie_awe.gif" alt="Character Reaction">
+    <img id="character-img"
+    src="budget_buddy/assets/miyabi/miyabi_neutral.gif"
+    alt="Character Reaction">
     </div>
   </main>
 
@@ -58,6 +67,7 @@
         <!-- Expense rows will be added here dynamically -->
       </tbody>
     </table>
+  </div>
 
   <footer>
     <p>Made with ❤️ for budgeting enthusiasts!</p>
