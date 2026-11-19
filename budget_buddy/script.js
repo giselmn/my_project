@@ -37,7 +37,7 @@ const expenseChart = new Chart(ctx, {
 
 
 
-let selectedCharacter = "miyabi";
+let selectedCharacter = "remielle";
 
 // Function to update selected character
 function updateCharacterSet() {
