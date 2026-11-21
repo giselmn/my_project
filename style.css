@@ -43,15 +43,43 @@ body {
     background-color: #4b10c8;
   }
   
+  /* Reduce space between form and balance section */
+  main {
+    gap: 0.5rem;
+  }
+
+  /* Remove extra margins and padding in the balance section */
+  #balance {
+    margin: 0;
+    padding: 0;
+  }
+
+  #balance p {
+    margin: 0.2rem 0; /* Minimal spacing between paragraphs */
+  }
+
+  
+  /* Ensure form and balance section align properly */
+  form#budget-form, #balance {
+    flex: 1;
+  }
+
+  /* Style the summary text */
   #result {
-    margin-top: 1rem;
+    margin-top: 0.5rem; /* Reduce space above the summary text */
     font-size: 1.2rem;
     font-weight: bold;
+    text-align: center; /* Center-align the summary text */
   }
-  
-  #character img {
-    margin-top: 2rem;
-    width: 150px;
+
+  /* Position the character image directly below the summary */
+  #character {
+    text-align: center; /* Center the image */
+    margin-top: 0.5rem; /* Reduce space above the image */
+  }
+
+  #character-img {
+    width: 250px;
     height: auto;
   }
   
