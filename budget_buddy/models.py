@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy.orm import relationship
 from database import Base
 
 class User(Base):
@@ -8,6 +9,8 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     password = Column(String)
 
+    expenses = relationship("Expense", back_populates="user")
+
 class Expense(Base):
     __tablename__ = "expenses"
 
@@ -15,3 +18,5 @@ class Expense(Base):
     amount = Column(Float)
     category = Column(String)
     user_id = Column(Integer)  # This can be used for relationships later
+
+    owner = relationship("User", back_populates="expenses")
