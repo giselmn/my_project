@@ -46,7 +46,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             detail="User not found",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return user
+    return {"id": user.id, "username": user.username}
 
 from pydantic import BaseModel
 
@@ -127,21 +127,17 @@ async def set_income(request: IncomeRequest, current_user: dict = Depends(get_cu
             "remainingBalance": remaining_balance,
         }
 
-@app.post("/add-expense")
-async def add_expense(request: ExpenseRequest, current_user: dict = Depends(get_current_user)):
-    global remaining_balance
-    if request.expense <= remaining_balance:
-        remaining_balance -= request.expense
-        expenses.append({"amount": request.expense, "category": request.category})
-        return {
-            "message": "Expense added successfully",
-            "remainingBalance": remaining_balance,
-            "expenses": expenses,
-        }
-    raise HTTPException(
-        status_code=400,
-        detail=f"Insufficient funds. Remaining balance: {remaining_balance}",
-    )
+@app.post("/add-expense", summary="Add a new expense")
+async def add_expense(request: ExpenseRequest, current_user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+    # Create a new expense
+    expense = Expense(amount=request.expense, category=request.category, user_id=current_user["id"])
+    db.add(expense)
+    db.commit()
+    db.refresh(expense)
+    return {
+        "message": "Expense added successfully",
+        "expense": {"id": expense.id, "amount": expense.amount, "category": expense.category},
+    }
 
 @app.get("/balance")
 async def get_balance(current_user: dict = Depends(get_current_user)):
@@ -150,9 +146,11 @@ async def get_balance(current_user: dict = Depends(get_current_user)):
         "remainingBalance": remaining_balance,
     }
 
-@app.get("/expenses")
-async def get_expenses(current_user: dict = Depends(get_current_user)):
-    return {"expenses": expenses}
+@app.get("/expenses", summary="Get all expenses")
+async def get_expenses(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    # Query the database for the user's expenses
+    user_expenses = db.query(Expense).filter(Expense.user_id == current_user.id).all()
+    return {"expenses": [{"id": e.id, "amount": e.amount, "category": e.category} for e in user_expenses]}
 
 @app.get("/exepnses-summary")
 async def expense_summary():
